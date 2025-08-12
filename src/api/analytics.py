@@ -22,7 +22,7 @@ def insert_notification(db: Session, request_id: int):
             request_id=request_id,
             channel="email",
             status="send",
-            sent_at=datetime.now(timezone.utc)  # timezone-aware UTC datetime
+            sent_at=datetime.now(timezone.utc)  
         )
         db.add(notif)
         db.commit()
