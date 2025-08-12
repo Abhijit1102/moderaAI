@@ -21,7 +21,7 @@ def insert_notification(db: Session, request_id: int):
         notif = models.NotificationLog(
             request_id=request_id,
             channel="email",
-            status="sent",
+            status="send",
             sent_at=datetime.now(timezone.utc)  # timezone-aware UTC datetime
         )
         db.add(notif)
