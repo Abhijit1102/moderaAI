@@ -44,8 +44,9 @@ Follow these steps to set up and run the Smart Content Moderator API locally:
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd <your-repo-folder>
+git clone https://github.com/Abhijit1102/moderaAI.git
+cd moderaAI
+```
 
 2. Create and activate a virtual environment:
 
