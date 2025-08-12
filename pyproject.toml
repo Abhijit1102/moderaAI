@@ -9,7 +9,6 @@ dependencies = [
     "cloudinary>=1.44.1",
     "fastapi>=0.116.1",
     "google-generativeai>=0.8.5",
-    "langchain-openai>=0.3.29",
     "pillow>=11.3.0",
     "pydantic[email]>=2.11.7",
     "python-dotenv>=1.1.1",
