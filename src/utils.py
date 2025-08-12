@@ -58,8 +58,6 @@ def clean_json(text: str) -> str:
     return cleaned
 
 
-import hashlib
-
 def hash_string(content: str) -> str:
     """
     Hashes the input string using SHA-256 and returns the hexadecimal digest.
