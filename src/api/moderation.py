@@ -12,6 +12,10 @@ from src.email_template import moderation_email_template
 from src.api.errors import ApiError, ApiResponse
 from src.logger import logger 
 
+from fastapi.responses import StreamingResponse
+from gtts import gTTS
+import io
+
 router = APIRouter()
 
 async def db_add_commit_refresh(db: Session, instance):
@@ -22,6 +26,45 @@ async def db_add_commit_refresh(db: Session, instance):
 
 async def db_commit(db: Session):
     await asyncio.to_thread(db.commit)
+
+from fastapi.responses import StreamingResponse
+from gtts import gTTS
+import io
+
+@router.post("/text-to-speech-moderation")
+async def text_to_speech_moderation(payload: schemas.TextModerationRequest):
+    if not payload.text.strip():
+        raise ApiError(400, "Text content cannot be empty", errors=["Empty text"])
+
+    try:
+        # Step 1: Run moderation via Gemini LLM
+        result_data = await asyncio.to_thread(classify_text_gemini, payload.text)
+
+        # Step 2: Convert the LLM "description" (or full reasoning if you prefer) into speech
+        text_for_tts = (
+            f"Classification: {result_data.classification}. "
+            f"Confidence: {result_data.confidence:.2f}. "
+            f"Summary: {result_data.description}"
+        )
+
+        def audio_stream():
+            audio_buffer = io.BytesIO()
+            tts = gTTS(text=text_for_tts, lang="en")
+            tts.write_to_fp(audio_buffer)
+            audio_buffer.seek(0)
+            yield from audio_buffer  # Stream audio chunks
+
+        # Step 3: Return as streaming MP3
+        return StreamingResponse(
+            audio_stream(),
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": "inline; filename=moderation.mp3"}
+        )
+
+    except Exception as e:
+        logger.error(f"TTS moderation failed: {e}")
+        raise ApiError(500, f"TTS moderation failed: {str(e)}")        
+
 
 @router.post("/text", response_model=ApiResponse)
 async def moderate_text(payload: schemas.TextModerationRequest, db: Session = Depends(get_db)):
